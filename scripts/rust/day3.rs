@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{self, Read};
 use std::path::Path;
@@ -12,17 +13,22 @@ fn main() -> io::Result<()> {
     let mul_indices = find_match(&contents, "mul(");
 
     // Record which indices correspond to do() and don't()
-    let do_indices = find_match(&contents, "do()");
-    let dont_indices = find_match(&contents, "don't()");
+    let mut do_indices = VecDeque::from(find_match(&contents, "do()"));
+    let mut dont_indices = VecDeque::from(find_match(&contents, "don't()"));
 
     // Track if multiplication is enabled
     let mut enabled = true;
 
     let mut result = 0;
     for index in mul_indices {
-        // Find if this index is enabled
         // If this index is > do[0], we are now enabled
-        // If this index is > dont[0] we are now disabled
+        if do_indices.len() > 0 && index > do_indices[0] {
+            enabled = true;
+            do_indices.pop_front();
+        } else if dont_indices.len() > 0 && index > dont_indices[0] {
+            enabled = false;
+            dont_indices.pop_front();
+        }
 
         if enabled {
             result += mul_numbers(&contents, index);
