@@ -11,8 +11,9 @@ fn main() -> io::Result<()> {
     // Record which indices correspond to the mul( characters
     let mul_indices = find_match(&contents, "mul(");
 
-    // Record which indices correspond to do()
-    // Record which indices correspond to don't()
+    // Record which indices correspond to do() and don't()
+    let do_indices = find_match(&contents, "do()");
+    let dont_indices = find_match(&contents, "don't()");
 
     // Track if multiplication is enabled
     let mut enabled = true;
@@ -46,7 +47,12 @@ where
 // Find which indices correspond to the mul( characters
 fn find_match(s: &str, substr: &str) -> Vec<usize> {
     let mut indices = Vec::new();
-    for (i, window) in s.chars().collect::<Vec<char>>().windows(4).enumerate() {
+    for (i, window) in s
+        .chars()
+        .collect::<Vec<char>>()
+        .windows(substr.len())
+        .enumerate()
+    {
         if window.into_iter().collect::<String>() == substr {
             indices.push(i);
         }
