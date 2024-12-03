@@ -7,9 +7,11 @@ fn main() -> io::Result<()> {
 
     // Read the file into a string
     let contents = read_file(path)?;
-    println!("{:?}", contents);
 
     // Record which indices correspond to the mul( characters
+    let mul_indices = find_muls(&contents);
+    println!("{:?}", mul_indices);
+
     // Find out which ones are valid
     // perform multiplications
     // Add the results
@@ -26,4 +28,15 @@ where
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
     Ok(contents)
+}
+
+// Find which indices correspond to the mul( characters
+fn find_muls(s: &str) -> Vec<usize> {
+    let mut mul_indices = Vec::new();
+    for (i, substr) in s.chars().collect::<Vec<char>>().windows(4).enumerate() {
+        if substr.into_iter().collect::<String>() == "mul(" {
+            mul_indices.push(i);
+        }
+    }
+    mul_indices
 }
