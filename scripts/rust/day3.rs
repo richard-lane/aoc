@@ -9,11 +9,23 @@ fn main() -> io::Result<()> {
     let contents = read_file(path)?;
 
     // Record which indices correspond to the mul( characters
-    let mul_indices = find_muls(&contents);
+    let mul_indices = find_match(&contents, "mul(");
+
+    // Record which indices correspond to do()
+    // Record which indices correspond to don't()
+
+    // Track if multiplication is enabled
+    let mut enabled = true;
 
     let mut result = 0;
     for index in mul_indices {
-        result += mul_numbers(&contents, index);
+        // Find if this index is enabled
+        // If this index is > do[0], we are now enabled
+        // If this index is > dont[0] we are now disabled
+
+        if enabled {
+            result += mul_numbers(&contents, index);
+        }
     }
     println!("Result: {}", result);
 
@@ -32,14 +44,14 @@ where
 }
 
 // Find which indices correspond to the mul( characters
-fn find_muls(s: &str) -> Vec<usize> {
-    let mut mul_indices = Vec::new();
-    for (i, substr) in s.chars().collect::<Vec<char>>().windows(4).enumerate() {
-        if substr.into_iter().collect::<String>() == "mul(" {
-            mul_indices.push(i);
+fn find_match(s: &str, substr: &str) -> Vec<usize> {
+    let mut indices = Vec::new();
+    for (i, window) in s.chars().collect::<Vec<char>>().windows(4).enumerate() {
+        if window.into_iter().collect::<String>() == substr {
+            indices.push(i);
         }
     }
-    mul_indices
+    indices
 }
 
 // Starting at a given index, find the numbers that need to be multiplied
