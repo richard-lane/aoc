@@ -30,9 +30,50 @@ fn main() -> io::Result<()> {
         }
     }
 
-    println!("Occurrences: {}", occurrences);
+    println!("XMAS Occurrences: {}", occurrences);
+
+    println!("{}", find_x_mas(&contents));
 
     Ok(())
+}
+
+// Find Xs of MAS in the grid
+fn find_x_mas(grid: &Vec<String>) -> usize {
+    // Turn the chars into ints
+    let grid: Vec<Vec<i32>> = grid
+        .iter()
+        .map(|row| row.chars().map(|c| c as i32).collect())
+        .collect();
+
+    let mut count = 0;
+
+    // Iterate over the grid, except the edges
+    for i in 1..grid.len() - 1 {
+        for j in 1..grid[i].len() - 1 {
+            // If we encounter an A
+            if grid[i][j] == 'A' as i32 {
+                {
+                    let a = grid[i - 1][j - 1];
+                    let b = grid[i + 1][j - 1];
+                    let c = grid[i - 1][j + 1];
+                    let d = grid[i + 1][j + 1];
+                    println!("Found A at ({}, {})", i, j);
+                    println!("a: {}, b: {}, c: {}, d: {}", a, b, c, d);
+
+                    // Check if the rows are equal and diff with each other are 6
+                    if (a == b) && (c == d) && (a - c).abs() == 6 {
+                        count += 1;
+                    }
+                    // Check if the columns are equal and diff with each other are 6
+                    else if (a == c) && (b == d) && (a - b).abs() == 6 {
+                        count += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    count
 }
 
 // Helper function to check if a word is present in a grid
