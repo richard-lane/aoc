@@ -21,11 +21,9 @@ fn main() {
                 break;
             };
             if my_dict.contains_key(col) {
-                if let Some(&dir) = my_dict.get(col) {
-                    loc = (i as usize, j as usize);
-                    direction = dir;
-                    found = true;
-                }
+                loc = (i as usize, j as usize);
+                direction = my_dict.get(col).unwrap().clone();
+                found = true;
             }
         }
         if found {
