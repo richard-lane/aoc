@@ -1,4 +1,22 @@
 use std::collections::HashMap;
+use std::fmt;
+
+#[derive(Debug)]
+enum MyError {
+    StuckInLoop,
+    GuardNotFound,
+}
+impl fmt::Display for MyError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            MyError::StuckInLoop => write!(f, "Stuck in a loop"),
+            MyError::GuardNotFound => write!(f, "Guard not found"),
+        }
+    }
+}
+
+// Implement the std::error::Error trait for MyError
+impl std::error::Error for MyError {}
 
 fn main() {
     let path = "inputs/day6.txt";
@@ -11,13 +29,52 @@ fn main() {
             .cloned()
             .collect();
 
-    let (mut loc, mut direction) = initial_conditions(&input, &dirn_map);
+    let (loc, direction) = initial_conditions(&input, &dirn_map).unwrap();
 
+    // Part 1 - just count the number of visits
+    let visited = find_visited(&input, loc, direction).unwrap();
+    let count = visited.iter().flatten().filter(|&&x| x == 'X').count();
+    println!("Number of houses visited: {}", count);
+
+    // Part 2 - try adding an obstacle to each location, and see if we get stuck
+    let mut n_loops = 0;
+    for i in 0..input.len() {
+        for j in 0..input[0].len() {
+            if input[i][j] == '#' || dirn_map.contains_key(&input[i][j]) {
+                continue;
+            }
+            let mut new_input = input.clone();
+            new_input[i][j] = '#';
+
+            match find_visited(&new_input, loc, direction) {
+                Ok(_) => (),
+                Err(MyError::StuckInLoop) => {
+                    n_loops += 1;
+                }
+                Err(e) => panic!("Unexpected error: {:?}", e),
+            }
+        }
+    }
+    println!("Number of obstacles causing a loop: {}", n_loops);
+}
+
+// Find the locations visited given the input
+fn find_visited(
+    input: &Vec<Vec<char>>,
+    mut loc: (i32, i32),
+    mut direction: (i32, i32),
+) -> Result<Vec<Vec<char>>, MyError> {
     // Initialise an array storing if the guard has visited a co-ordinate
     let mut visited = vec![vec!['.'; input[0].len()]; input.len()];
 
+    let mut n_visited = 0;
     loop {
         visited[loc.0 as usize][loc.1 as usize] = 'X';
+        n_visited += 1;
+        // If this is more than the total size of the grid, raise; we've clearly got stuck in a loop
+        if n_visited > input.len() * input[0].len() {
+            return Err(MyError::StuckInLoop);
+        }
 
         let next_loc = ((loc.0 + direction.0), (loc.1 + direction.1));
 
@@ -27,9 +84,6 @@ fn main() {
             || next_loc.1 < 0
             || next_loc.1 >= input[0].len() as i32
         {
-            for row in &visited {
-                println!("{:?}", row);
-            }
             break;
         }
 
@@ -46,21 +100,16 @@ fn main() {
         } else {
             loc = next_loc;
         };
-
-        // Find out if we have visited this co-ordinate before and are facing the same direction
     }
 
-    // Count the number of visited co-ordinates
-    // THis is the number of Xs
-    let count = visited.iter().flatten().filter(|&&x| x == 'X').count();
-    println!("Number of houses visited: {}", count);
+    return Ok(visited);
 }
 
 // Find the initial location and direction
 fn initial_conditions(
     input: &Vec<Vec<char>>,
     dirn_map: &HashMap<char, (i32, i32)>,
-) -> ((i32, i32), (i32, i32)) {
+) -> Result<((i32, i32), (i32, i32)), MyError> {
     // Find the direction she is moving in and her location
     let mut found = false;
     let mut loc = (0, 0);
@@ -83,10 +132,10 @@ fn initial_conditions(
     }
     // If we didn't break, raise an error
     if !found {
-        panic!("Guard not found");
+        return Err(MyError::GuardNotFound);
     }
 
-    (loc, direction)
+    Ok((loc, direction))
 }
 
 // Read the text file into a vector of vector of chars
