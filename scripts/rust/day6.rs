@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 #[derive(Debug)]
@@ -40,7 +40,7 @@ fn main() {
     let mut n_loops = 0;
     for i in 0..input.len() {
         for j in 0..input[0].len() {
-            if input[i][j] == '#' || dirn_map.contains_key(&input[i][j]) {
+            if input[i][j] == '#' || dirn_map.contains_key(&input[i][j]) || visited[i][j] != 'X' {
                 continue;
             }
             let mut new_input = input.clone();
@@ -67,14 +67,12 @@ fn find_visited(
     // Initialise an array storing if the guard has visited a co-ordinate
     let mut visited = vec![vec!['.'; input[0].len()]; input.len()];
 
-    let mut n_visited = 0;
+    let mut visited_locations = HashSet::new();
     loop {
-        visited[loc.0 as usize][loc.1 as usize] = 'X';
-        n_visited += 1;
-        // If this is more than the total size of the grid, raise; we've clearly got stuck in a loop
-        if n_visited > input.len() * input[0].len() {
+        if !visited_locations.insert((loc, direction)) {
             return Err(MyError::StuckInLoop);
         }
+        visited[loc.0 as usize][loc.1 as usize] = 'X';
 
         let next_loc = ((loc.0 + direction.0), (loc.1 + direction.1));
 
