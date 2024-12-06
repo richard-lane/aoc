@@ -21,7 +21,7 @@ fn main() {
                 break;
             };
             if my_dict.contains_key(col) {
-                loc = (i as usize, j as usize);
+                loc = (i as i32, j as i32);
                 direction = my_dict.get(col).unwrap().clone();
                 found = true;
             }
@@ -35,18 +35,45 @@ fn main() {
         panic!("Guard not found");
     }
 
-    println!("{:?}, {:?}", loc, direction);
-
     // Initialise an array storing if the guard has visited a co-ordinate
-    // Iterate
-    // While true
-    // check if the next step is an obstacle
-    // if it is, turn right
-    // Otherwise, update position
-    // If we're outside the grid, break
-    // Update the visited array
+    let mut visited = vec![vec!['.'; input[0].len()]; input.len()];
+
+    loop {
+        visited[loc.0 as usize][loc.1 as usize] = 'X';
+
+        let next_loc = ((loc.0 + direction.0), (loc.1 + direction.1));
+
+        // Find out if the next step is outside of the grid
+        if next_loc.0 < 0
+            || next_loc.0 >= input.len() as i32
+            || next_loc.1 < 0
+            || next_loc.1 >= input[0].len() as i32
+        {
+            for row in &visited {
+                println!("{:?}", row);
+            }
+            break;
+        }
+
+        // Find out if the next co-ordinate is a wall
+        if input[next_loc.0 as usize][next_loc.1 as usize] == '#' {
+            direction = match direction {
+                (0, 1) => (1, 0),
+                (1, 0) => (0, -1),
+                (0, -1) => (-1, 0),
+                (-1, 0) => (0, 1),
+                _ => panic!("Invalid direction"),
+            };
+            loc = ((loc.0 + direction.0), (loc.1 + direction.1));
+        } else {
+            loc = next_loc;
+        };
+    }
 
     // Count the number of visited co-ordinates
+    // THis is the number of Xs
+    let count = visited.iter().flatten().filter(|&&x| x == 'X').count();
+    println!("Number of houses visited: {}", count);
 }
 
 // Read the text file into a vector of vector of chars
