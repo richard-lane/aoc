@@ -69,7 +69,7 @@ fn find_visited(
 
     let mut visited_locations = HashSet::new();
     loop {
-        if !visited_locations.insert((loc, direction)) {
+        if !visited_locations.insert((loc.0, loc.1, direction.0, direction.1)) {
             return Err(MyError::StuckInLoop);
         }
         visited[loc.0 as usize][loc.1 as usize] = 'X';
