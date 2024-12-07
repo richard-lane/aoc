@@ -8,6 +8,8 @@ fn main() {
     let lines = std::fs::read_to_string(path).unwrap();
 
     for line in lines.lines() {
+        let mut total = 0;
+
         // Split by space
         let all_numbers: Vec<&str> = line.split_whitespace().collect();
 
@@ -20,7 +22,11 @@ fn main() {
         let numbers = all_numbers[1..].iter().map(|x| x.parse::<i32>().unwrap()).collect::<Vec<i32>>();
 
         // Find how many operators we need
+        let n_operators = numbers.len() - 1;
+
         // Make every possible permutation of operators
+        let operator_lists = Vec<Vec<char>>::new();
+
         // For each permutation, calculate the total
         // Check if this is correct
         // If it is, incrememt the counter
