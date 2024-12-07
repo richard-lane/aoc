@@ -15,6 +15,8 @@ fn main() {
     let path = "inputs/day7.txt";
     let lines = std::fs::read_to_string(path).unwrap();
 
+    let mut n_correct_lines = 0;
+
     for line in lines.lines() {
         // Split by space
         let all_numbers: Vec<&str> = line.split_whitespace().collect();
@@ -37,26 +39,27 @@ fn main() {
         let operator_combinations: HashSet<Vec<char>> = operators
             .iter()
             .cloned()
-            .combinations_with_replacement(n_operators) // Combinations allow repetition
-            .flat_map(|combo| combo.into_iter().permutations(n_operators)) // Get permutations
-            .map(|perm| perm.into_iter().collect::<Vec<char>>()) // Convert permutations to Vec<char>
+            .combinations_with_replacement(n_operators)
+            .flat_map(|combo| combo.into_iter().permutations(n_operators))
+            .map(|perm| perm.into_iter().collect::<Vec<char>>())
             .collect();
 
         // For each permutation, calculate the total
         for operator_combo in operator_combinations {
-            // Calculate the total based on this operator combination
-            println!("{:?}", operator_combo);
-
-            // let mut result = numbers[0];
-            // for (i, &op) in operator_combo.iter().enumerate() {
-            //     match op {
-            //         '+' => result += numbers[i + 1],
-            //         '*' => result *= numbers[i + 1],
-            //         _ => panic!("Unexpected operator"),
-            //     }
-            // }
+            let mut result = numbers[0];
+            for (i, &op) in operator_combo.iter().enumerate() {
+                match op {
+                    '+' => result += numbers[i + 1],
+                    '*' => result *= numbers[i + 1],
+                    _ => panic!("Unexpected operator"),
+                }
+            }
+            if result == target_num {
+                n_correct_lines += 1;
+                break;
+            }
         }
-        // Check if this is correct
-        // If it is, incrememt the counter
     }
+
+    println!("{}", n_correct_lines);
 }
