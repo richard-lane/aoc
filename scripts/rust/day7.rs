@@ -15,7 +15,8 @@ fn main() {
     let path = "inputs/day7.txt";
     let lines = std::fs::read_to_string(path).unwrap();
 
-    let mut n_correct_lines = 0;
+    // Part 1 score
+    let mut total= 0;
 
     for line in lines.lines() {
         // Split by space
@@ -55,11 +56,11 @@ fn main() {
                 }
             }
             if result == target_num {
-                n_correct_lines += 1;
+                total += result;
                 break;
             }
         }
     }
 
-    println!("{}", n_correct_lines);
+    println!("{}", total);
 }
