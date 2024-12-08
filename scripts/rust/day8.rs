@@ -29,22 +29,28 @@ fn main () {
                     continue;
                 }
                 // Find the distance between them
-                let dx = pos1.0 - pos2.0;
-                let dy = pos1.1 - pos2.1;
+                let dx = (pos1.0 - pos2.0) as i32;
+                let dy = (pos1.1 - pos2.1) as i32;
 
                 // Possible antinode locations
-                let x1 = pos1.0 + dx;
-                let y1 = pos1.1 + dy;
+                let mut x1 = pos1.0 as i32 + dx;
+                let mut y1 = pos1.1 as i32 + dy;
 
-                let x2 = pos2.0 - dx;
-                let y2 = pos2.1 - dy;
+                let mut x2 = pos2.0 as i32 - dx;
+                let mut y2 = pos2.1 as i32 - dy;
 
                 // Check if they're in bounds
-                if x1 >= 0 && x1 < input.len() && y1 >= 0 && y1 < input[0].len() {
-                    antinode_grid[x1][y1] = 'A';
+                while x1 >= 0 && x1 < input.len() as i32 && y1 >= 0 && y1 < input[0].len() as i32 {
+                    antinode_grid[x1 as usize][y1 as usize] = 'A';
+
+                    x1 += dx;
+                    y1 += dy;
                 }
-                if x2 >= 0 && x2 < input.len() && y2 >= 0 && y2 < input[0].len() {
-                    antinode_grid[x2][y2] = 'A';
+                while x2 >= 0 && x2 < input.len() as i32 && y2 >= 0 && y2 < input[0].len() as i32 {
+                    antinode_grid[x2 as usize][y2 as usize] = 'A';
+
+                    x2 -= dx;
+                    y2 -= dy;
                 }
             }
         }
