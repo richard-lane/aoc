@@ -18,7 +18,7 @@ fn main() {
     let lines = std::fs::read_to_string(path).unwrap();
 
     // Part 1 score
-    let mut total= 0;
+    let mut total = 0 as i128;
 
     for line in lines.lines() {
         // Split by space
@@ -53,13 +53,24 @@ fn main() {
             .collect();
 
         // For each permutation, calculate the total
-        let pb = ProgressBar::new(operator_combinations.len() as u64);
-        for operator_combo in &operator_combinations {
-            let mut result = numbers[0];
+        for operator_combo in operator_combinations {
+            let mut result = numbers[0] as i128;
             for (i, &op) in operator_combo.iter().enumerate() {
                 match op {
-                    '+' => result += numbers[i + 1],
-                    '*' => result *= numbers[i + 1],
+                    '+' => {
+                        if let Some(new_result) = result.checked_add(numbers[i + 1].into()) {
+                            result = new_result;
+                        } else {
+                            continue; // Skip this combination if overflow occurs
+                        }
+                    }
+                    '*' => {
+                        if let Some(new_result) = result.checked_mul(numbers[i + 1].into()) {
+                            result = new_result;
+                        } else {
+                            continue; // Skip this combination if overflow occurs
+                        }
+                    }
                     _ => panic!("Unexpected operator"),
                 }
                 if result > target_num {
@@ -67,7 +78,7 @@ fn main() {
                 }
             pb.inc(1);
             }
-            if result == target_num {
+            if result == target_num.into() {
                 total += result;
                 break;
             }
