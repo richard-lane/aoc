@@ -34,15 +34,18 @@ fn main() {
     }
 
     let mut total_score = 0;
+    let mut total_rating = 0;
     for i in 0..rows {
         for j in 0..cols {
             if grid[i][j] == 0 {
                 total_score += count_score(&grid, &graph, (i, j));
+                total_rating += rating(&grid, &graph, (i, j));
             }
         }
     }
 
     println!("Total paths from 0 to 9: {}", total_score);
+    println!("Total paths from 0 to 9 with rating: {}", total_rating);
 }
 
 fn count_score(
@@ -75,4 +78,34 @@ fn count_score(
     }
 
     score
+}
+
+fn rating(
+    grid: &Vec<Vec<u8>>,
+    graph: &HashMap<(usize, usize), Vec<(usize, usize)>>,
+    start: (usize, usize),
+) -> u32 {
+    let mut stack = Vec::new();
+    stack.push((start, vec![start]));
+
+    let mut paths = 0;
+
+    while let Some((current, path)) = stack.pop() {
+        if grid[current.0][current.1] == 9 {
+            paths += 1;
+            continue;
+        }
+
+        if let Some(neighbors) = graph.get(&current) {
+            for &neighbor in neighbors {
+                if !path.contains(&neighbor) {
+                    let mut new_path = path.clone();
+                    new_path.push(neighbor);
+                    stack.push((neighbor, new_path));
+                }
+            }
+        }
+    }
+
+    paths
 }
