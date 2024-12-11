@@ -1,35 +1,39 @@
-fn main() {
-    let input = std::fs::read_to_string("inputs/day11.txt")
-        .unwrap()
-        .split_whitespace()
-        .map(|x| x.parse::<i128>().unwrap())
-        .collect::<Vec<i128>>();
+use std::collections::HashMap;
 
-    let mut stones = input;
-    for i in 0..25 {
-        stones = blink(&stones);
-        println!("After {} blinks, there are {} stones", i + 1, stones.len());
+fn main() {
+    // Store how many of each number we have in a HashMap
+    let path = "inputs/day11.txt";
+    let content = std::fs::read_to_string(path).unwrap();
+    let mut counts = HashMap::new();
+    for num in content
+        .split_whitespace()
+        .map(|s| s.parse::<i64>().unwrap())
+    {
+        *counts.entry(num).or_insert(0) += 1;
+    }
+
+    // Apply the rules to the stones
+    for i in 0..75 {
+        counts = update(&counts);
+        println!("After {} iterations: {:?}", i + 1, counts.values().sum::<usize>());
     }
 }
 
-fn blink(stones: &Vec<i128>) -> Vec<i128> {
-    let mut new_stones = Vec::new();
-    for stone in stones {
-        let val = *stone;
-        if val == 0 {
-            new_stones.push(1);
-        // Check if the stone has an even number of digits
-        } else if val.to_string().len() % 2 == 0 {
-            // Split the digits in half, create two new stones
-            let half = val.to_string().len() / 2;
-            let val_str = val.to_string();
-            let (left, right) = val_str.split_at(half);
-            new_stones.push(left.parse::<i128>().unwrap());
-            new_stones.push(right.parse::<i128>().unwrap());
-        } else {
-            new_stones.push(val * 2024);
+fn update(stones: &HashMap<i64, usize>) -> HashMap<i64, usize> {
+    let mut new_stones = HashMap::with_capacity(stones.len());
+    for (&k, &v) in stones {
+        match k {
+            0 => *new_stones.entry(1).or_default() += v,
+            _ => {
+                let n_digits = k.ilog10() + 1;
+                if n_digits % 2 == 0 {
+                    *new_stones.entry(k % 10i64.pow(n_digits / 2)).or_default() += v;
+                    *new_stones.entry(k / 10i64.pow(n_digits / 2)).or_default() += v;
+                } else {
+                    *new_stones.entry(k * 2024).or_default() += v;
+                }
+            }
         }
     }
-
     new_stones
 }
