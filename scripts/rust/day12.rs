@@ -28,7 +28,7 @@ fn dfs(
     j: i32,
     grid: &Vec<Vec<char>>,
     visited: &mut Vec<Vec<bool>>,
-    area: i32,
+    mut area: i32,
     perimeter: i32,
     current_char: char,
 ) -> (i32, i32) {
@@ -44,17 +44,17 @@ fn dfs(
 
     // Check if we have reached a new letter
     if grid[i as usize][j as usize] != current_char {
-        return (area, perimeter + 1);
+        return (area, perimeter);
     }
 
-    // Mark the cell as visited
+    area += 1;
     visited[i as usize][j as usize] = true;
 
     // Recursively visit the neighbors
-    let (area, perimeter) = dfs(i + 1, j, grid, visited, area + 1, perimeter, current_char);
-    let (area, perimeter) = dfs(i - 1, j, grid, visited, area + 1, perimeter, current_char);
-    let (area, perimeter) = dfs(i, j + 1, grid, visited, area + 1, perimeter, current_char);
-    let (area, perimeter) = dfs(i, j - 1, grid, visited, area + 1, perimeter, current_char);
+    let (area, perimeter) = dfs(i + 1, j, grid, visited, area, perimeter, current_char);
+    let (area, perimeter) = dfs(i - 1, j, grid, visited, area, perimeter, current_char);
+    let (area, perimeter) = dfs(i, j + 1, grid, visited, area, perimeter, current_char);
+    let (area, perimeter) = dfs(i, j - 1, grid, visited, area, perimeter, current_char);
 
     return (area, perimeter);
 }
