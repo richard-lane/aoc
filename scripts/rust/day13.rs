@@ -10,42 +10,22 @@ fn main() -> io::Result<()> {
     for machine in input.split("\n\n").collect::<Vec<&str>>() {
         let (matrix, prize) = parse(machine);
 
-        // Check if the matrix is invertible
-        let det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
-        if det == 0 {
-            println!("The matrix is not invertible");
-            continue;
-        }
+        cost += solve(matrix[0][0], matrix[1][0], matrix[0][1], matrix[1][1], prize[0], prize[1]);
+        println!("Cost: {}", cost);
 
-        // If it is, solve how many presses we need of each button
-        let inv_det = 1.0 / det as f64;
-        let inverse_matrix = vec![
-            vec![
-                matrix[1][1] as f64 * inv_det,
-                -matrix[0][1] as f64 * inv_det,
-            ],
-            vec![
-                -matrix[1][0] as f64 * inv_det,
-                matrix[0][0] as f64 * inv_det,
-            ],
-        ];
-
-        let result = vec![
-            inverse_matrix[0][0] * prize[0] as f64 + inverse_matrix[0][1] * prize[1] as f64,
-            inverse_matrix[1][0] * prize[0] as f64 + inverse_matrix[1][1] * prize[1] as f64,
-        ];
-
-        // Check if the result is a whole number
-        if result.iter().all(|&x| (x - x.round()).abs() < 1e-5) {
-            println!("possible: {:?}", result);
-            cost += (3 * result[0].round() as i64) + (result[1].round() as i64);
-        } else {
-            println!("Result: {:?}", result);
-        }
     }
 
     println!("Cost: {}", cost);
     Ok(())
+}
+
+fn solve(x1: i64, x2: i64, y1: i64, y2: i64, z1: i64, z2: i64) -> i64 {
+    let b = (z2 * x1 - z1 * x2) / (y2 * x1 - y1 * x2);
+    let a = (z1 - b * y1) / x1;
+    if (x1 * a + y1 * b, x2 * a + y2 * b) != (z1, z2) {
+        return 0;
+    }
+    a * 3 + b
 }
 
 // Helper function to parse the input into a matrix and vector
