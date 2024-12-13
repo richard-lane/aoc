@@ -18,7 +18,6 @@ fn main() -> io::Result<()> {
         }
 
         // If it is, solve how many presses we need of each button
-        let inv = 1.0 / det as f64;
         let inv_det = 1.0 / det as f64;
         let inverse_matrix = vec![
             vec![
@@ -37,8 +36,11 @@ fn main() -> io::Result<()> {
         ];
 
         // Check if the result is a whole number
-        if result.iter().all(|&x| (x - x.round()).abs() < 1e-6) {
-            cost += (3 * result[0].round() as i32) + (result[1].round() as i32) ;
+        if result.iter().all(|&x| (x - x.round()).abs() < 1e-5) {
+            println!("possible: {:?}", result);
+            cost += (3 * result[0].round() as i64) + (result[1].round() as i64);
+        } else {
+            println!("Result: {:?}", result);
         }
     }
 
@@ -47,7 +49,7 @@ fn main() -> io::Result<()> {
 }
 
 // Helper function to parse the input into a matrix and vector
-fn parse(input: &str) -> (Vec<Vec<i32>>, Vec<i32>) {
+fn parse(input: &str) -> (Vec<Vec<i64>>, Vec<i64>) {
     // Init an empty 2x2 matrix
     let mut matrix = vec![vec![0; 2]; 2];
     let mut prize = vec![0; 2];
@@ -64,18 +66,18 @@ fn parse(input: &str) -> (Vec<Vec<i32>>, Vec<i32>) {
 
     // Third line is 3
     let x = parse_line(split_input[2]);
-    prize[0] = x.0;
-    prize[1] = x.1;
+    prize[0] = x.0 + 10000000000000;
+    prize[1] = x.1 + 10000000000000;
 
     (matrix, prize)
 }
 
 // Get the button coordinates
-fn parse_line(input: &str) -> (i32, i32) {
+fn parse_line(input: &str) -> (i64, i64) {
     let parts: Vec<&str> = input.split(", ").collect();
     let x_part = parts[0].split(": ").collect::<Vec<&str>>()[1];
     let y_part = parts[1];
-    let x_value: i32 = x_part[2..].parse().unwrap();
-    let y_value: i32 = y_part[2..].parse().unwrap();
+    let x_value: i64 = x_part[2..].parse().unwrap();
+    let y_value: i64 = y_part[2..].parse().unwrap();
     (x_value, y_value)
 }
